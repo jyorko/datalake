@@ -43,12 +43,6 @@ spec:
           volumeMounts:
             - mountPath: /home/docker/work
               name: notebook-data
-    
-            - name: GHCR_LOGIN
-              valueFrom:
-                secretKeyRef:
-                  name: ghcr-login
-                  key: .dockerconfigjson
       volumes:
         - name: notebook-data
           persistentVolumeClaim:
