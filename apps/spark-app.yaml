@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: spark
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jyorko/datalake
+    targetRevision: HEAD
+    path: application-charts/spark
+  destination:
+    namespace: datalake
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

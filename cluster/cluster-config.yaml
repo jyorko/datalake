@@ -1,0 +1,14 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: cadbo-datalake-1  # Specify the existing cluster name
+  region: us-west-2
+
+managedNodeGroups:
+  - name: managed-ng-2
+    desiredCapacity: 5
+    instanceType: m5.8xlarge
+    minSize: 3
+    maxSize: 10
+    volumeSize: 100  # Set this to your desired volume size in GiB

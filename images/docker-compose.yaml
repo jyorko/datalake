@@ -1,0 +1,19 @@
+name: open-data-lake
+
+services:
+ 
+
+  spark:
+    image: ghcr.io/jyorko/cadbo-datalake:spark
+    build: .
+    ports: 
+      - 8888:8888
+
+    container_name: spark
+    networks:
+      - iceberg_env
+
+networks:
+  iceberg_env:
+    name: iceberg_env
+    driver: bridge

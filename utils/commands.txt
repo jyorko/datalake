@@ -1,0 +1,44 @@
+# Apache Superset
+kubectl create namespace datalake
+helm repo add superset https://apache.github.io/superset
+helm repo update
+helm upgrade --install --values superset-values.yaml superset superset/superset 
+user: admin
+password: admin
+
+# Nessie
+
+kubectl create namespace nessie-ns
+helm repo add nessie-helm https://charts.projectnessie.org
+helm repo update
+helm install -n datalake nessie nessie-helm/nessie --set replicaCount=3
+
+
+# MINIO
+cd minio/operator
+helm install \
+--namespace minio-operator \
+--create-namespace \
+operator operator-5.0.15.tgz --values custom-operator-values.yaml
+
+helm install --namespace minio-operator --create-namespace operator /home/jyorko/datalake/operator/operator-5.0.15.tgz --values custom-operator-values.yaml
+
+
+
+#optional
+kubectl get service console -n minio-operator -o yaml > service.yaml
+yq e -i '.spec.type="NodePort"' service.yaml
+yq e -i '.spec.ports[0].nodePort = PORT_NUMBER' service.yaml
+
+kubectl get deployment minio-operator -n minio-operator -o yaml > operator.yaml
+yq -i -e '.spec.replicas |= 1' operator.yaml
+kubectl apply -f service.yaml
+kubectl apply -f operator.yaml
+kubectl apply -f console-secret.yaml
+
+
+
+# Dremio
+
+cd dremio-cloud-tools/charts/dremio_v2/
+helm install cadbo-dremio . -f my-values.yaml --namespace cadbo

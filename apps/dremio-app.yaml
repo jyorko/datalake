@@ -1,0 +1,39 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: dremio
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/jyorko/datalake
+    targetRevision: HEAD
+    path: application-charts/dremio-cloud-tools/charts/dremio_v2
+    helm:
+      valueFiles:
+        - values.yaml
+      parameters:
+        - name: accessKey
+          value: $AWS_ACCESS_KEY
+        - name: secret
+          value: $AWS_SECRET_KEY
+  destination:
+    namespace: datalake
+    server: 'https://kubernetes.default.svc'
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+  environment:
+    - name: AWS_ACCESS_KEY
+      valueFrom:
+        secretKeyRef:
+          name: aws-credentials
+          key: accessKey
+    - name: AWS_SECRET_KEY
+      valueFrom:
+        secretKeyRef:
+          name: aws-credentials
+          key: secret
